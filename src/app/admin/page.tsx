@@ -1,3 +1,23 @@
-"use client";
-import {useState} from "react";
-export default function AdminHome(){const [signedIn,setSignedIn]=useState(false);const [email,setEmail]=useState("");const [password,setPassword]=useState("");if(!signedIn)return <main className="shell"><header className="topbar"><a className="brand" href="/">YREL<span>.</span> Control</a><span className="tag">PRIVATE ADMIN</span></header><section className="hero"><div className="eyebrow">OPERATIONS CONSOLE</div><h1>Run every ride<br/>with clarity.</h1><p>Manage bookings, customers, partners, pricing and support.</p></section><section className="auth-wrap"><h1>Admin sign in</h1><p className="muted">Authorized administrators only. This preview does not grant access or authenticate credentials yet.</p><label className="field"><span>ADMIN EMAIL</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="Enter admin email"/></label><label className="field"><span>PASSWORD</span><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="Enter password"/></label><button className="primary" onClick={()=>setSignedIn(true)}>Preview dashboard layout</button><p className="notice" style={{marginTop:16}}>Preview only — secure Appwrite authentication and server-side admin role checks are not connected. Do not use for live operations.</p></section></main>;return <main className="shell" style={{maxWidth:980}}><header className="topbar"><div className="brand">YREL<span>.</span> Control</div><button className="pill" onClick={()=>setSignedIn(false)}>Exit preview</button></header><section className="hero"><div className="eyebrow">ADMINISTRATION</div><h1>Operations overview</h1><p>Monitor bookings, partners and service activity.</p></section><section className="section"><div className="dashboard-grid">{[["—","Today's bookings"],["₹—","Today's revenue"],["—","Active drivers"],["—","Customers"]].map(([v,l])=><div className="stat" key={l}><strong>{v}</strong><small>{l}</small></div>)}</div></section><section className="section"><div className="section-head"><h2>Management</h2><span className="tag">LAYOUT PREVIEW</span></div><div className="service-grid">{["Bookings","Drivers & Partners","Customers","Vehicles","Wallet & Settlements","Commission","Pricing & Packages","Seat Sharing","Reports & Analytics","Complaints & SOS","Notifications","Settings"].map((x,i)=><div className="service" key={x}><span className="emoji">{["▤","♙","☺","🚘","₹","%","⚙","⇄","▥","⚑","♢","☷"][i]}</span><strong>{x}</strong><small>Management workspace</small></div>)}</div><p className="notice" style={{marginTop:14}}>This is a dashboard layout preview using sample placeholders. Live data, actions, and permissions will be connected and tested before production.</p></section></main>}
+import { redirect } from "next/navigation";
+import { getUserContext } from "@/lib/server/appwrite";
+
+export default async function AdminPage() {
+  const context = await getUserContext();
+  if (!context) redirect("/admin/login");
+  const labels = String(context.user.labels ?? "");
+  if (!labels.split(",").includes("admin")) redirect("/");
+  return (
+    <main className="shell">
+      <header className="topbar"><div className="brand">YREL<span>.</span> Admin</div><span className="tag">Private console</span></header>
+      <section className="auth-wrap">
+        <span className="eyebrow">OPERATIONS</span>
+        <h1>Admin dashboard</h1>
+        <p className="muted">Signed in as {context.user.email || context.user.name || "administrator"}.</p>
+        <div className="dashboard-grid">
+          {["Bookings","Drivers","Customers","Vehicles","Wallet & Settlements","Pricing & Packages","Seat Sharing","Reports & Analytics","Complaints & SOS","Notifications","Settings","Audit Log"].map((item) => <div className="stat" key={item}><strong>—</strong><small>{item}</small></div>)}
+        </div>
+        <p className="notice" style={{marginTop:16}}>Live management modules are being connected to the protected Appwrite data model. No demo data is shown as real operational data.</p>
+      </section>
+    </main>
+  );
+}
