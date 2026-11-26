@@ -28,7 +28,9 @@ export async function POST(request: NextRequest) {
   const fullName = text(body.full_name, 128);
   const phone = text(body.phone, 24);
   const preferredLanguage = text(body.preferred_language, 8) || "en";
-  if (phone && !/^\\+?91?\\d{10}$/.test(phone.replace(/[\\s-]/g, ""))) {
+  const normalizedPhone = phone.replaceAll(" ", "").replaceAll("-", "");
+  const phoneDigits = normalizedPhone.startsWith("+91") ? normalizedPhone.slice(3) : normalizedPhone.startsWith("91") && normalizedPhone.length === 12 ? normalizedPhone.slice(2) : normalizedPhone;
+  if (phone && !/^[6-9][0-9]{9}$/.test(phoneDigits)) {
     return NextResponse.json({ error: "Enter a valid Indian mobile number." }, { status: 400 });
   }
   if (!["en", "kn", "hi"].includes(preferredLanguage)) {
