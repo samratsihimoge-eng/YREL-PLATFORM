@@ -1,5 +1,5 @@
 import "server-only";
-import { Account, Client, ID, TablesDB } from "appwrite";
+import { Account, Client, ID, TablesDB } from "node-appwrite";
 import { cookies } from "next/headers";
 
 const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? "https://sgp.cloud.appwrite.io/v1";

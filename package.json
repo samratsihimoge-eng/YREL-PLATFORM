@@ -9,7 +9,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "appwrite": "^21.0.0",
+    "node-appwrite": "^18.0.0",
     "lucide-react": "^0.468.0",
     "next": "^15.5.0",
     "react": "^19.1.0",

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Permission, Role } from "node-appwrite";
 import { databaseConfig, getUserContext, ID } from "@/lib/server/appwrite";
-import { Permission, Role } from "appwrite";
 import { number, text, jsonObject } from "@/lib/validation";
 
 export async function GET() {
@@ -8,7 +8,10 @@ export async function GET() {
   if (!context) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
   const db = databaseConfig();
   try {
-    const result = await context.tables.listRows({ databaseId: db.databaseId, tableId: db.bookings });
+    const result = await context.tables.listRows({
+      databaseId: db.databaseId,
+      tableId: db.bookings,
+    });
     const rows = (result.rows ?? []).filter((row: Record<string, unknown>) => row.customer_id === context.user.$id);
     return NextResponse.json({ bookings: rows });
   } catch {
@@ -48,7 +51,16 @@ export async function POST(request: NextRequest) {
     booking_details: JSON.stringify(jsonObject(body.booking_details)),
   };
   try {
-    const row = await context.tables.createRow({ databaseId: db.databaseId, tableId: db.bookings, rowId: ID.unique(), data: payload, permissions: [Permission.read(Role.user(context.user.$id)), Permission.update(Role.user(context.user.$id))] });
+    const row = await context.tables.createRow({
+      databaseId: db.databaseId,
+      tableId: db.bookings,
+      rowId: ID.unique(),
+      data: payload,
+      permissions: [
+        Permission.read(Role.user(context.user.$id)),
+        Permission.update(Role.user(context.user.$id)),
+      ],
+    });
     return NextResponse.json({ booking: row }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Booking could not be saved. Confirm the Appwrite bookings table columns and user create permission." }, { status: 503 });
