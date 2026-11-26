@@ -9,12 +9,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@appwrite.io/ssr": "^0.7.0",
     "appwrite": "^21.0.0",
     "lucide-react": "^0.468.0",
     "next": "^15.5.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
