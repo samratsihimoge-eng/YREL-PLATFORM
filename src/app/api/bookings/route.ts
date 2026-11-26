@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { databaseConfig, getUserContext, ID } from "@/lib/server/appwrite";
+import { Permission, Role } from "appwrite";
 import { number, text, jsonObject } from "@/lib/validation";
 
 export async function GET() {
@@ -35,19 +36,19 @@ export async function POST(request: NextRequest) {
     vehicle_type: text(body.vehicle_type, 40) || "hatchback",
     pickup, dropoff,
     pickup_lat: number(body.pickup_lat, -90, 90),
-    pickup_lng: number(body.pickup_lng, -180, 180),
+    pickup_lon: number(body.pickup_lon ?? body.pickup_lng, -180, 180),
     dropoff_lat: number(body.dropoff_lat, -90, 90),
-    dropoff_lng: number(body.dropoff_lng, -180, 180),
+    dropoff_lon: number(body.dropoff_lon ?? body.dropoff_lng, -180, 180),
     distance_km: distance,
     estimated_fare: fare,
     final_fare: 0,
     status: "requested",
     payment_method: text(body.payment_method, 20) || "cash",
     scheduled_at: text(body.scheduled_at, 60) || new Date().toISOString(),
-    booking_details: jsonObject(body.booking_details),
+    booking_details: JSON.stringify(jsonObject(body.booking_details)),
   };
   try {
-    const row = await context.tables.createRow({ databaseId: db.databaseId, tableId: db.bookings, rowId: ID.unique(), data: payload });
+    const row = await context.tables.createRow({ databaseId: db.databaseId, tableId: db.bookings, rowId: ID.unique(), data: payload, permissions: [Permission.read(Role.user(context.user.$id)), Permission.update(Role.user(context.user.$id))] });
     return NextResponse.json({ booking: row }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Booking could not be saved. Confirm the Appwrite bookings table columns and user create permission." }, { status: 503 });
