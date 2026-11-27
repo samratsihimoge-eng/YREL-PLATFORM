@@ -1,6 +1,6 @@
 import "server-only";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { Client, TablesDB } from "node-appwrite";
+import { Client, TablesDB, ID } from "node-appwrite";
 import { cookies } from "next/headers";
 
 const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? "https://sgp.cloud.appwrite.io/v1";
@@ -42,7 +42,7 @@ export async function getUserContext() {
   if (!apiKey) return null;
   const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
   const tables = new TablesDB(client);
-  const user = { $id: session.userId, phone: session.phone, labels: session.role === "admin" ? ["admin"] : [session.role], name: session.role };
+  const user = { $id: session.userId, phone: session.phone, email: undefined as string | undefined, labels: session.role === "admin" ? ["admin"] : [session.role], name: session.role };
   return { client, user, tables, role: session.role };
 }
 export async function setSessionCookie(token: string, expires: Date) {
@@ -66,3 +66,5 @@ export function databaseConfig() {
     credentials: process.env.APPWRITE_AUTH_CREDENTIALS_TABLE_ID ?? "auth_credentials",
   };
 }
+
+export { ID };
