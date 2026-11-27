@@ -5,6 +5,7 @@ import { databaseConfig, getUserContext } from "@/lib/server/appwrite";
 async function partnerContext() {
   const context = await getUserContext();
   if (!context) return { error: NextResponse.json({ error: "Sign in required." }, { status: 401 }) } as const;
+  if (context.role !== "partner") return { error: NextResponse.json({ error: "Partner access required." }, { status: 403 }) } as const;
   const db = databaseConfig();
   const profileResult = await context.tables.listRows({ databaseId: db.databaseId, tableId: db.drivers, queries: [Query.equal("user_id", context.user.$id), Query.limit(1)] });
   const profile = profileResult.rows?.[0];

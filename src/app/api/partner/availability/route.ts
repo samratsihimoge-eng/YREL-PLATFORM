@@ -5,6 +5,7 @@ import { text } from "@/lib/validation";
 export async function POST(request: NextRequest) {
   const context = await getUserContext();
   if (!context) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  if (context.role !== "partner") return NextResponse.json({ error: "Partner access required." }, { status: 403 });
   const db = databaseConfig();
   let body: { online?: boolean };
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid JSON" }, { status: 400 }); }

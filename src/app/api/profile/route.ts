@@ -6,6 +6,7 @@ import { text } from "@/lib/validation";
 export async function GET() {
   const context = await getUserContext();
   if (!context) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+  if (context.role !== "customer") return NextResponse.json({ error: "Customer access required." }, { status: 403 });
   try {
     const db = databaseConfig();
     const result = await context.tables.listRows({
