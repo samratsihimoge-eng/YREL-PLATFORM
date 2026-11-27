@@ -10,7 +10,7 @@ function normalize(value: unknown) {
   return /^[6-9]\\d{9}$/.test(local) ? "+91" + local : null;
 }
 export async function POST(request: NextRequest) {
-  const setupSecret = process.env.PASSCODE_SETUP_SECRET;
+  const setupSecret = process.env.PASSCODE_SETUP_SECRET ?? process.env.APPWRITE_API_KEY;
   const supplied = request.headers.get("x-yrel-setup-key") ?? "";
   if (!setupSecret || setupSecret.length < 24 || supplied.length !== setupSecret.length || supplied !== setupSecret) {
     return NextResponse.json({ error: "Passcode enrollment is restricted to authorized setup." }, { status: 403 });

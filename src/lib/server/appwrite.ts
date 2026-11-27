@@ -9,7 +9,7 @@ const cookieName = "yrel_session";
 
 type SessionPayload = { userId: string; phone: string; role: "customer" | "partner" | "admin"; exp: number };
 function sessionSecret() {
-  const secret = process.env.AUTH_SESSION_SECRET;
+  const secret = process.env.AUTH_SESSION_SECRET ?? process.env.APPWRITE_API_KEY;
   if (!secret || secret.length < 32) throw new Error("AUTH_SESSION_SECRET must be at least 32 characters.");
   return secret;
 }
