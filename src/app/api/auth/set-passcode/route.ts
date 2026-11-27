@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   if (!setupSecret || setupSecret.length < 24 || supplied.length !== setupSecret.length || supplied !== setupSecret) {
     return NextResponse.json({ error: "Passcode enrollment is restricted to authorized setup." }, { status: 403 });
   }
-  let body: { phone?: string; passcode?: string; role?: string };
+  let body: { phone?: string; passcode?: string; role?: string; name?: string };
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid request." }, { status: 400 }); }
   const phone = normalize(body.phone);
   const passcode = String(body.passcode ?? "");
