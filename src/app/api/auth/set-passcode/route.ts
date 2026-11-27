@@ -27,9 +27,17 @@ export async function POST(request: NextRequest) {
   try {
     const users = new Users(client);
     const match = await users.list({ queries: [Query.equal("phone", phone), Query.limit(1)] });
-    const user = match.users?.[0];
-    if (!user) return NextResponse.json({ error: "This phone number is not an existing verified YREL account. Create or verify the account in the admin system first." }, { status: 404 });
-    if (role === "admin" && !user.labels?.includes("admin")) return NextResponse.json({ error: "Only an existing administrator can be enrolled as admin." }, { status: 403 });
+    let user = match.users?.[0];
+    if (!user) {
+      // This endpoint is protected by the owner-only setup secret. Create a phone-only
+      // Appwrite identity with a random, undisclosed password; YREL passcode auth is used.
+      user = await users.create({
+        userId: ID.unique(),
+        phone,
+        password: randomBytes(36).toString("base64url") + "aA1!",
+        name: String(body.name ?? (role === "admin" ? "YREL Administrator" : role === "partner" ? "YREL Partner" : "YREL Customer")).slice(0, 128),
+      });
+    }
     const db = databaseConfig();
     const tables = new TablesDB(client);
     const existing = await tables.listRows({ databaseId: db.databaseId, tableId: db.credentials, queries: [Query.equal("phone", phone), Query.equal("role", role), Query.limit(1)] });
