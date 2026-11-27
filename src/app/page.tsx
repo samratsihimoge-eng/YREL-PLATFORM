@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, CarFront, Clock3, Compass, MapPin, Plane, ShieldCheck, UsersRound } from "lucide-react";
+import { ArrowUpRight, CarFront, Clock3, MapPin, Plane, ShieldCheck, UsersRound } from "lucide-react";
 
 const services = [
   { title: "City rides", detail: "Quick everyday journeys", href: "/book", icon: CarFront, tone: "lavender" },
