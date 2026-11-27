@@ -5,9 +5,9 @@ import { createSessionToken, setSessionCookie, databaseConfig } from "@/lib/serv
 
 export const runtime = "nodejs";
 function normalize(value: unknown) {
-  const digits = String(value ?? "").replace(/\\D/g, "");
+  const digits = String(value ?? "").replace(/\D/g, "");
   const local = digits.startsWith("91") && digits.length === 12 ? digits.slice(2) : digits;
-  return /^[6-9]\\d{9}$/.test(local) ? "+91" + local : null;
+  return /^[6-9]\d{9}$/.test(local) ? "+91" + local : null;
 }
 function verifyHash(pin: string, stored: string) {
   try {
@@ -24,11 +24,11 @@ export async function POST(request: NextRequest) {
   const phone = normalize(body.phone);
   const passcode = String(body.passcode ?? "");
   const role = String(body.role ?? "customer");
-  if (!phone || !/^\\d{6}$/.test(passcode) || !["customer", "partner", "admin"].includes(role)) {
+  if (!phone || !/^\d{6}$/.test(passcode) || !["customer", "partner", "admin"].includes(role)) {
     return NextResponse.json({ error: "Enter your valid mobile number and six-digit passcode." }, { status: 400 });
   }
   const apiKey = process.env.APPWRITE_API_KEY;
-  const secret = process.env.AUTH_SESSION_SECRET;
+  const secret = process.env.AUTH_SESSION_SECRET ?? process.env.APPWRITE_API_KEY;
   if (!apiKey || !secret || secret.length < 32) return NextResponse.json({ error: "Passcode login is not configured on the server." }, { status: 503 });
   const client = new Client().setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? "https://sgp.cloud.appwrite.io/v1").setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID ?? "6b083d3e000ee339326b").setKey(apiKey);
   const tables = new TablesDB(client);
